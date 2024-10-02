@@ -1,32 +1,39 @@
-import { Suspense, useEffect } from 'react';
-import { Canvas } from '@react-three/fiber';
-import { useGLTF, OrbitControls, CameraShake, useAnimations } from '@react-three/drei';
-import * as THREE from 'three';
-import { GLTF } from 'three-stdlib';
+import { Suspense } from "react";
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls, PointerLockControls } from "@react-three/drei";
 
-useGLTF.preload('/robot-draco.glb');
+function Model() {
+  return (
+    <group>
+      {/* Plane */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
+        <planeGeometry args={[10, 10]} />
+        <meshStandardMaterial color="lightgray" />
+      </mesh>
 
-function Model(props: JSX.IntrinsicElements['group']) {
-  const { scene, animations } = useGLTF('/robot-draco.glb') as GLTF & { animations: any };
-  const { actions } = useAnimations(animations, scene);
-
-  useEffect(() => {
-    if (actions?.Idle) {
-      actions.Idle.play();
-    }
-  }, [actions]);
-
-  return <primitive object={scene} {...props} />;
+      {/* Cube */}
+      <mesh position={[0, 0.5, 0]} castShadow>
+        <boxGeometry args={[1, 1, 1]} />
+        <meshStandardMaterial color="skyblue" />
+      </mesh>
+    </group>
+  );
 }
 
 export default function Viewer() {
   return (
-    <Canvas shadows camera={{ fov: 50 }}>
+    <Canvas shadows camera={{ fov: 50, position: [0, 3, 5] }}>
       <Suspense fallback={null}>
         <Model />
       </Suspense>
-      <OrbitControls makeDefault />
-      <CameraShake
+
+      {/* Free Look Camera (PointerLockControls) */}
+      <PointerLockControls />
+
+      {/* Lighting */}
+      <ambientLight intensity={0.5} />
+      <directionalLight position={[5, 5, 5]} castShadow intensity={1} />
+      {/* <CameraShake
         maxYaw={0.1}
         maxPitch={0.1}
         maxRoll={0.1}
@@ -35,7 +42,7 @@ export default function Viewer() {
         rollFrequency={0.1}
         intensity={1}
         decayRate={0.65}
-      />
+      /> */}
     </Canvas>
   );
 }
