@@ -1,8 +1,6 @@
 import * as THREE from 'three';
-import React, { useRef } from 'react';
-import { useGLTF, MeshReflectorMaterial } from '@react-three/drei';
+import { useGLTF } from '@react-three/drei';
 import { GLTF } from 'three-stdlib';
-import { Mesh } from 'three';
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -15,8 +13,6 @@ type GLTFResult = GLTF & {
 
 export function Desk(props: JSX.IntrinsicElements['group']) {
   const { nodes, materials } = useGLTF('./Desk.glb') as GLTFResult;
-  
-  const overlayRef = useRef<Mesh>(null);
 
   return (
     <group {...props} dispose={null}>

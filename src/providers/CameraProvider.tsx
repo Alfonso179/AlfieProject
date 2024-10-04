@@ -1,4 +1,3 @@
-// CameraProvider.tsx
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
 import { Vector3 } from 'three';
 
