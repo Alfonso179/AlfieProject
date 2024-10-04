@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
+import { OrbitControls, Sky } from '@react-three/drei';
 import { CameraProvider } from "../providers/CameraProvider";
 import { Desk } from '../models/DeskModel';
 import { Environment } from '../models/Envrionment';
@@ -15,12 +15,13 @@ const WebGL = () => {
           camera={{ fov: 50, position: [0, 5, 5] }} 
           gl={{ alpha: false }} 
         >
-          <color attach="background" args={["white"]} />
+          <color attach="background" args={["skyblue"]} />
           
           <CameraController />
           <Suspense fallback={null}>
             <Environment />
             <WaterMat />
+            <Sky sunPosition={[500, 150, -1000]} turbidity={0.1} />
             <Desk />
           </Suspense>
           <OrbitControls enablePan={true} enableZoom={true} enableRotate={true} />
