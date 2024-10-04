@@ -4,6 +4,7 @@ import { OrbitControls } from '@react-three/drei';
 import { CameraProvider } from "../providers/CameraProvider";
 import { Desk } from '../models/DeskModel';
 import { Environment } from '../models/Envrionment';
+import { WaterMat } from './WaterMaterial';
 import CameraController from './CameraController';
 
 const WebGL = () => {
@@ -14,11 +15,12 @@ const WebGL = () => {
           camera={{ fov: 50, position: [0, 5, 5] }} 
           gl={{ alpha: false }} 
         >
-          <color attach="background" args={["skyblue"]} />
+          <color attach="background" args={["white"]} />
           
           <CameraController />
           <Suspense fallback={null}>
             <Environment />
+            <WaterMat />
             <Desk />
           </Suspense>
           <OrbitControls enablePan={true} enableZoom={true} enableRotate={true} />

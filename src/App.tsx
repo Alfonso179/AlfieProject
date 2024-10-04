@@ -1,7 +1,4 @@
-// App.tsx
-import React from 'react';
-import WebGL from './components/WebGL'; // Adjust the path based on your folder structure
-
+import WebGL from './components/WebGL';
 function App() {
   return (
     <div style={{ height: '100vh' }}>
