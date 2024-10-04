@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, PointerLockControls } from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei";
 
 function Model() {
   return (
@@ -27,22 +27,12 @@ export default function Viewer() {
         <Model />
       </Suspense>
 
-      {/* Free Look Camera (PointerLockControls) */}
-      <PointerLockControls />
+      {/* Use Orbit Controls instead of PointerLockControls */}
+      <OrbitControls enablePan={true} enableZoom={true} enableRotate={true} />
 
       {/* Lighting */}
       <ambientLight intensity={0.5} />
       <directionalLight position={[5, 5, 5]} castShadow intensity={1} />
-      {/* <CameraShake
-        maxYaw={0.1}
-        maxPitch={0.1}
-        maxRoll={0.1}
-        yawFrequency={0.1}
-        pitchFrequency={0.1}
-        rollFrequency={0.1}
-        intensity={1}
-        decayRate={0.65}
-      /> */}
     </Canvas>
   );
 }
