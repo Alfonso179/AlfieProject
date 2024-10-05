@@ -12,14 +12,11 @@ class SkateboardController {
   private keyMap: { [id: string]: boolean } = {};
 
   constructor() {
-    // Initialize necessary three.js components
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(this.renderer.domElement);
-
-    console.log('Scene, camera, and renderer initialized');
 
     const light = new THREE.DirectionalLight(0xffffff, 1);
     light.position.set(5, 10, 7.5);
@@ -84,24 +81,17 @@ class SkateboardController {
     // Movement controls
     if (this.keyMap['KeyW'] || this.keyMap['ArrowUp']) {
       this.skateboardBody.applyLocalForce(new CANNON.Vec3(0, 0, -5), new CANNON.Vec3(0, 0, 0));
-      console.log('Applying forward force');
     }
     if (this.keyMap['KeyS'] || this.keyMap['ArrowDown']) {
       this.skateboardBody.applyLocalForce(new CANNON.Vec3(0, 0, 5), new CANNON.Vec3(0, 0, 0));
-      console.log('Applying backward force');
     }
     if (this.keyMap['KeyA'] || this.keyMap['ArrowLeft']) {
       this.skateboardBody.angularVelocity.set(0, 1, 0);
-      console.log('Applying left rotation');
     }
     if (this.keyMap['KeyD'] || this.keyMap['ArrowRight']) {
       this.skateboardBody.angularVelocity.set(0, -1, 0);
-      console.log('Applying right rotation');
     }
-
-    // Render the scene
     this.renderer.render(this.scene, this.camera);
-    console.log('Rendering frame');
   }
 }
 

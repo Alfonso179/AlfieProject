@@ -14,7 +14,6 @@ import SkateboardController from '../components/SkateboardController';
 const WebGL = () => {
 
   useEffect(() => {
-    // Initialize the skateboard controller
     console.log('Initializing skateboard controller');
     const skateboardController = new SkateboardController();
     return () => {
@@ -37,11 +36,9 @@ const WebGL = () => {
           <Environment />
           <WaterMat />
           <Sky sunPosition={[500, 150, -1000]} turbidity={20} />
-          {/* <Desk />  Uncomment if needed */}
           <Bridge/>
           <Skateboard/>
           <SceneWithLamposts/>
-          {/* Lampost instances are managed by SceneWithLamposts */}
         </Suspense>
         <OrbitControls enablePan={true} enableZoom={true} enableRotate={true} />
       </Canvas>
