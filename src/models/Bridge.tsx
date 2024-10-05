@@ -31,7 +31,7 @@ export function Bridge(props: JSX.IntrinsicElements['group']) {
             receiveShadow
             geometry={mesh.geometry}
             material={material}
-            position={[-25, 2.5, -25]} 
+            position={[-25, 0, -25]} 
             rotation={[degreesToRadians(90), degreesToRadians(180), degreesToRadians(-45)]}
             scale={mesh.scale.clone().multiplyScalar(5)} // Uniformly scale by a factor of 2
           />
