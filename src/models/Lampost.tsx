@@ -15,9 +15,6 @@ type GLTFResult = GLTF & {
 export function Lampost(props: JSX.IntrinsicElements['group']) {
   const { nodes, materials } = useGLTF('./Lampost.glb') as GLTFResult;
 
-  console.log('Lampost model loaded. Nodes:', nodes);
-  console.log('Lampost model loaded. Materials:', materials);
-
   return (
     <group {...props} dispose={null}>
       {Object.entries(nodes).map(([name, mesh]) => {
@@ -26,7 +23,6 @@ export function Lampost(props: JSX.IntrinsicElements['group']) {
           : (mesh.material as THREE.Material)?.name;
 
         const material = materials[materialName ?? 'Steel'] || materials[''];
-        console.log(`Rendering mesh: ${name}`);
         
         return (
           <mesh
@@ -57,12 +53,9 @@ export function SceneWithLamposts() {
     z: THREE.MathUtils.randFloatSpread(PLANE_DEPTH),
   }));
 
-  console.log('Generated lamppost positions:', lamppostPositions);
-
   return (
     <group>
       {lamppostPositions.map((pos, index) => {
-        console.log(`Placing lamppost #${index + 1} at position:`, pos);
         return (
           <Lampost
             key={index}
