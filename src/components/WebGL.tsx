@@ -6,6 +6,7 @@ import { Desk } from '../models/DeskModel';
 import { Environment } from '../models/Envrionment';
 import { WaterMat } from './WaterMaterial';
 import CameraController from './CameraController';
+import { Bridge } from '../models/Bridge';
 
 const WebGL = () => {
     return (
@@ -23,6 +24,7 @@ const WebGL = () => {
             <WaterMat />
             <Sky sunPosition={[500, 150, -1000]} turbidity={0.1} />
             <Desk />
+            <Bridge/>
           </Suspense>
           <OrbitControls enablePan={true} enableZoom={true} enableRotate={true} />
         </Canvas>
