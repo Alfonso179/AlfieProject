@@ -24,9 +24,6 @@ export function Bridge(props: JSX.IntrinsicElements['group']) {
 
         const material = materials[materialName ?? 'Steel'] || materials[''];
 
-        // Define rotation angles in degrees
-        const rotationDegrees: [number, number, number] = [90, 180, -45];
-
         return (
           <mesh
             key={name}
@@ -34,9 +31,9 @@ export function Bridge(props: JSX.IntrinsicElements['group']) {
             receiveShadow
             geometry={mesh.geometry}
             material={material}
-            position={[-25, 0.7, -25]}  
-            rotation={rotationDegrees.map(degreesToRadians) as [number, number, number]}
-            scale={mesh.scale}
+            position={[-25, 2.5, -25]} 
+            rotation={[degreesToRadians(90), degreesToRadians(180), degreesToRadians(-45)]}
+            scale={mesh.scale.clone().multiplyScalar(5)} // Uniformly scale by a factor of 2
           />
         );
       })}

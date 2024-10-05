@@ -7,8 +7,7 @@ import { Environment } from '../models/Envrionment';
 import { WaterMat } from './WaterMaterial';
 import CameraController from './CameraController';
 import { Bridge } from '../models/Bridge';
-import { Lampost } from '../models/Lampost'; // Note the capitalization
-
+import { Lampost, SceneWithLamposts } from '../models/Lampost';
 const WebGL = () => {
     return (
       <CameraProvider>
@@ -23,10 +22,11 @@ const WebGL = () => {
           <Suspense fallback={null}>
             <Environment />
             <WaterMat />
-            <Sky sunPosition={[500, 150, -1000]} turbidity={0.1} />
-            <Desk />
+            <Sky sunPosition={[500, 150, -1000]} turbidity={20} />
+            {/* <Desk /> */}
             <Bridge/>
-            <Lampost/> {/* Corrected the JSX element */}
+            <Lampost/>
+            <SceneWithLamposts/>
           </Suspense>
           <OrbitControls enablePan={true} enableZoom={true} enableRotate={true} />
         </Canvas>
