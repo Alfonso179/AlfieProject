@@ -19,7 +19,7 @@ export function Environment() {
         intensity={1}
         castShadow
       />
-      {/* <Reflector
+      <Reflector
         blur={[400, 100]}
         resolution={1024}
         args={[50, 50]}
@@ -38,7 +38,7 @@ export function Environment() {
             {...props}
           />
         )}
-      </Reflector> */}
+      </Reflector>
     </group>
   );
 }
