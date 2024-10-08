@@ -16,7 +16,7 @@ export function Skateboard(props: JSX.IntrinsicElements['group']) {
   const { nodes, materials } = useGLTF('./longboard.glb') as GLTFResult;
 
   return (
-    <group {...props} dispose={null}>
+    <group ref={ref}>
       {Object.entries(nodes).map(([name, mesh]) => {
         const materialName = Array.isArray(mesh.material)
           ? mesh.material[0]?.name
@@ -31,9 +31,8 @@ export function Skateboard(props: JSX.IntrinsicElements['group']) {
             receiveShadow
             geometry={mesh.geometry}
             material={material}
-            position={[1, 0.085, 0]} 
-            rotation={[degreesToRadians(-90), degreesToRadians(0), degreesToRadians(0)]}
-            scale={mesh.scale.clone().multiplyScalar(0.2)} 
+            scale={0.2} // Adjust as needed
+            rotation={[0, 90, 0]} // Adjust as needed
           />
         );
       })}
