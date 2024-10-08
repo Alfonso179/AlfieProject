@@ -1,139 +1,92 @@
-import * as THREE from 'three';
+import React, { useEffect, useImperativeHandle, useState } from 'react';
+import { useFrame } from '@react-three/fiber';
+import { useBox } from '@react-three/cannon';
+import { useGLTF } from '@react-three/drei';
 import * as CANNON from 'cannon-es';
 
-interface Dimensions {
-  x: number;
-  y: number;
-  z: number;
+interface SkateboardControllerProps {
+  material: CANNON.Material;
+  position?: [number, number, number];
 }
 
-export default class SkateboardController {
-  private scene: THREE.Scene;
-  private camera!: THREE.PerspectiveCamera;
-  private renderer!: THREE.WebGLRenderer;
-  private world: CANNON.World;
-  private skateboardBody!: CANNON.Body;
-  private skateboardMesh!: THREE.Mesh;
-  private clock!: THREE.Clock;
-  private keyMap: { [id: string]: boolean } = {};
+const SkateboardController: React.FC<SkateboardControllerProps> = ({
+  material,
+  position = [0, 2, 0],
+}) => {
+  const { nodes, materials } = useGLTF('./longboard.glb') as any;
+  const [ref, api] = useBox(() => ({
+    mass: 1,
+    position,
+    args: [1, 0.2, 2],
+    material: material,
+  }));
 
-  constructor(scene: THREE.Scene, world: CANNON.World) {
-    this.scene = scene;
-    this.world = world;
-    this.initialize();
-  }
+  const [keyMap, setKeyMap] = useState<{ [key: string]: boolean }>({});
 
-  private initialize() {
-    // Camera and rendering setup
-    this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(this.renderer.domElement);
-    console.log('Camera and renderer initialized');
+  // Keyboard events
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      setKeyMap((prev) => ({ ...prev, [e.code]: true }));
+    };
 
-    // Lighting
-    const light = new THREE.DirectionalLight(0xffffff, 1);
-    light.position.set(5, 10, 7.5);
-    this.scene.add(light);
-    console.log('Light added to the scene');
+    const handleKeyUp = (e: KeyboardEvent) => {
+      setKeyMap((prev) => ({ ...prev, [e.code]: false }));
+    };
 
-    // Physics
-    this.setupPhysicsWorld();
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
 
-    // Skateboard setup
-    this.setupSkateboard();
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, []);
 
-    // Event Listeners
-    this.initEventListeners();
-    
-    // Start animation loop
-    this.animate();
-  }
-
-  private setupPhysicsWorld() {
-    this.world.gravity.set(0, -9.82, 0);
-    console.log('Physics world initialized with gravity:', this.world.gravity);
-
-    // Ground plane
-    const groundMaterial = new CANNON.Material('groundMaterial');
-    const groundBody = new CANNON.Body({ mass: 0, material: groundMaterial });
-    const groundShape = new CANNON.Plane();
-    groundBody.addShape(groundShape);
-    this.world.addBody(groundBody);
-    console.log('Ground plane added to physics world');
-  }
-
-  private setupSkateboard() {
-    // Define skateboard dimensions
-    const skateboardDimensions: Dimensions = { x: 1, y: 0.2, z: 2 };
-
-    // Create skateboard body
-    const skateboardMaterial = new CANNON.Material('skateboardMaterial');
-    const skateboardShape = new CANNON.Box(new CANNON.Vec3(skateboardDimensions.x / 2, skateboardDimensions.y / 2, skateboardDimensions.z / 2));
-    this.skateboardBody = new CANNON.Body({
-      mass: 1,
-      position: new CANNON.Vec3(0, 1, 0),
-      material: skateboardMaterial,
-    });
-    this.skateboardBody.addShape(skateboardShape);
-    this.world.addBody(this.skateboardBody);
-    console.log('Skateboard body added to physics world');
-
-    // Mesh for visualization
-    const skateboardGeometry = new THREE.BoxGeometry(skateboardDimensions.x, skateboardDimensions.y, skateboardDimensions.z);
-    this.skateboardMesh = new THREE.Mesh(skateboardGeometry, new THREE.MeshStandardMaterial({ color: 0xff0000 }));
-    this.scene.add(this.skateboardMesh);
-    console.log('Skateboard mesh added to scene');
-
-    this.clock = new THREE.Clock();
-  }
-
-  private initEventListeners() {
-    document.addEventListener('keydown', (e) => {
-      this.keyMap[e.code] = true;
-      console.log(`Key down: ${e.code}`);
-    });
-
-    document.addEventListener('keyup', (e) => {
-      this.keyMap[e.code] = false;
-      console.log(`Key up: ${e.code}`);
-    });
-  }
-
-  private applyControls() {
-    // Movement controls
-    if (this.keyMap['KeyW'] || this.keyMap['ArrowUp']) {
-      this.skateboardBody.applyLocalForce(new CANNON.Vec3(0, 0, -5), new CANNON.Vec3(0, 0, 0));
-      console.log('Applying forward force');
+  // Apply controls in the physics update loop
+  useFrame(() => {
+    if (keyMap['KeyW'] || keyMap['ArrowUp']) {
+      api.applyLocalForce([0, 0, -25], [0, 0, 0]);
     }
-    if (this.keyMap['KeyS'] || this.keyMap['ArrowDown']) {
-      this.skateboardBody.applyLocalForce(new CANNON.Vec3(0, 0, 5), new CANNON.Vec3(0, 0, 0));
-      console.log('Applying backward force');
+    if (keyMap['KeyS'] || keyMap['ArrowDown']) {
+      api.applyLocalForce([0, 0, 25], [0, 0, 0]);
     }
-    if (this.keyMap['KeyA'] || this.keyMap['ArrowLeft']) {
-      this.skateboardBody.angularVelocity.set(0, 1, 0);
-      console.log('Applying left rotation');
+    if (keyMap['KeyA'] || keyMap['ArrowLeft']) {
+      api.applyTorque([0, 10, 0]);
     }
-    if (this.keyMap['KeyD'] || this.keyMap['ArrowRight']) {
-      this.skateboardBody.angularVelocity.set(0, -1, 0);
-      console.log('Applying right rotation');
+    if (keyMap['KeyD'] || keyMap['ArrowRight']) {
+      api.applyTorque([0, -10, 0]);
     }
-  }
+  });
 
-  private animate() {
-    requestAnimationFrame(() => this.animate());
-    const delta = this.clock.getDelta();
-    this.world.step(1 / 60, delta);
+  return (
+    <group ref={ref}>
+      <group
+        position={[0, -0.1, 0]} // Adjust to align model with physics body
+        rotation={[Math.PI / 2, 0, 0]}
+        scale={[0.2, 0.2, 0.2]}
+      >
+        {Object.entries(nodes).map(([name, mesh]) => {
+          const materialName = Array.isArray(mesh.material)
+            ? mesh.material[0]?.name
+            : mesh.material?.name;
+          const material =
+            materials[materialName ?? 'Default'] || materials[''];
 
-    // Apply movement and update
-    this.applyControls();
+          return (
+            <mesh
+              key={name}
+              castShadow
+              receiveShadow
+              geometry={mesh.geometry}
+              material={material}
+              position={[0, 0, -0.5]}
+              rotation={[0, Math.PI, 0]}
+            />
+          );
+        })}
+      </group>
+    </group>
+  );
+};
 
-    // Update skateboard position and orientation
-    this.skateboardMesh.position.copy(this.skateboardBody.position as any);
-    this.skateboardMesh.quaternion.copy(this.skateboardBody.quaternion as any);
-
-    // Render the scene
-    this.renderer.render(this.scene, this.camera);
-    console.log('Rendering frame');
-  }
-}
+export default SkateboardController;
