@@ -1,4 +1,4 @@
-import React, { Suspense, useMemo } from 'react';
+import React, { Suspense, useEffect, useMemo, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import {
   OrbitControls,
@@ -10,6 +10,8 @@ import { Debug, Physics, useContactMaterial } from '@react-three/cannon';
 import SkateboardController from './SkateboardController';
 import { usePlane } from '@react-three/cannon';
 import * as CANNON from 'cannon-es';
+import CameraController from './CameraController';
+import { Object3D } from 'three';
 
 // GroundPlane component accepting material as prop
 const GroundPlane = ({ material }) => {
@@ -27,7 +29,9 @@ const GroundPlane = ({ material }) => {
 };
 
 // New component for physics materials and contact materials
-const PhysicsMaterials = () => {
+const PhysicsMaterials: React.FC<{
+  skateboardRef: React.RefObject<THREE.Group>;
+}> = ({ skateboardRef }) => {
   const groundMaterial = useMemo(
     () => new CANNON.Material('groundMaterial'),
     []
@@ -43,47 +47,52 @@ const PhysicsMaterials = () => {
     restitution: 0.0,
   });
 
+  useEffect(() => {
+    if (skateboardRef.current) {
+      console.log('WebGL skateboardRef.current:', skateboardRef.current);
+    }
+  }, [skateboardRef]);
   return (
     <>
       {/* Pass materials to components */}
       <GroundPlane material={groundMaterial} />
-      <SkateboardController material={skateboardMaterial} />
+      <SkateboardController ref={skateboardRef} material={skateboardMaterial} />
     </>
   );
 };
 
 const WebGL = () => {
+  const skateboardRef = useRef<Three.Group>(null);
+
+
   return (
-    <CameraProvider>
-      <Canvas
-        shadows
-        camera={{ fov: 50, position: [0, 5, 10] }}
-        gl={{ alpha: false }}
-      >
-        {/* Lighting and other components */}
-        <ambientLight intensity={0.4} />
-        <directionalLight
-          position={[-50, 50, -50]}
-          intensity={0.4}
-          castShadow
-        />
+    // <CameraProvider>
+    <Canvas
+      shadows
+      camera={{ fov: 50, position: [0, 5, 10] }}
+      gl={{ alpha: false }}
+    >
+      {/* Lighting and other components */}
+      <ambientLight intensity={0.4} />
+      <directionalLight position={[-50, 50, -50]} intensity={0.4} castShadow />
 
-        {/* Physics provider */}
-        <Physics gravity={[0, -9.82, 0]}>
-          <Debug scale={1}>
-            <Suspense fallback={null}>
-              {/* Render PhysicsMaterials inside Physics */}
-              <PhysicsMaterials />
-            </Suspense>
-          </Debug>
-        </Physics>
+      {/* Physics provider */}
+      <Physics gravity={[0, -9.82, 0]}>
+        <Debug scale={1}>
+          <Suspense fallback={null}>
+            {/* Render PhysicsMaterials inside Physics */}
+            <PhysicsMaterials skateboardRef={skateboardRef} />
+          </Suspense>
+        </Debug>
+      </Physics>
 
-        {/* Environment and controls */}
-        <Sky sunPosition={[500, 150, -1000]} turbidity={20} />
-        <DreiEnvironment preset="city" />
-        <OrbitControls enablePan={true} enableZoom={true} enableRotate={true} />
-      </Canvas>
-    </CameraProvider>
+      {/* Environment and controls */}
+      <Sky sunPosition={[500, 150, -1000]} turbidity={20} />
+      <DreiEnvironment preset="city" />
+      {/* <OrbitControls enablePan={true} enableZoom={true} enableRotate={true} /> */}
+      <CameraController targetRef={skateboardRef} />
+    </Canvas>
+    // </CameraProvider>
   );
 };
 
